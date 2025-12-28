@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # --- 1. APP CONFIGURATION ---
 st.set_page_config(page_title="Quant Pairs Trader", layout="wide")
-st.title("⚡ Statistical Arbitrage: Pairs Trading Dashboard")
+st.title("Statistical Arbitrage: Pairs Trading Dashboard")
 
 # Sidebar for controls
 st.sidebar.header("Strategy Settings")
@@ -141,4 +141,5 @@ st.pyplot(fig_price)
 
 # Show Data Table
 with st.expander("See Raw Data"):
+
     st.dataframe(data.tail(20))
