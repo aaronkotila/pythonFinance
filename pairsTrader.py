@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# --- 1. APP CONFIGURATION ---
+# APP CONFIGURATION
 st.set_page_config(page_title="Quant Pairs Trader", layout="wide")
 st.title("Statistical Arbitrage: Pairs Trading Dashboard")
 
@@ -27,7 +27,7 @@ ticker_a, ticker_b = pairs[pair_name]
 window = st.sidebar.slider("Z-Score Lookback (Days):", min_value=10, max_value=100, value=30)
 entry_threshold = st.sidebar.number_input("Entry Threshold (Std Dev):", value=2.0, step=0.1)
 
-# --- 2. DATA LOADING (Cached) ---
+# DATA LOADING (Cached)
 @st.cache_data
 def get_data(t1, t2):
     # auto_adjust=False to fix the FutureWarning and get raw Close
@@ -46,7 +46,7 @@ except Exception as e:
     st.error(f"Error downloading data: {e}")
     st.stop()
 
-# --- 3. CALCULATIONS ---
+# CALCULATIONS
 # Calculate Ratio
 data['Ratio'] = data[ticker_a] / data[ticker_b]
 
@@ -59,7 +59,7 @@ data['Z_Score'] = (data['Ratio'] - rolling_mean) / rolling_std
 data['Ret_A'] = data[ticker_a].pct_change()
 data['Ret_B'] = data[ticker_b].pct_change()
 
-# --- 4. BACKTEST LOGIC (Event-Driven Loop) ---
+# BACKTEST LOGIC (Event-Driven Loop)
 # Logic: Enter at +/- Threshold. Exit when Z-Score crosses 0 (Mean Reversion).
 positions = []
 current_position = 0 # 1 = Long Ratio, -1 = Short Ratio, 0 = Flat
@@ -92,7 +92,7 @@ data['Strategy_Ret'] = data['Position'].shift(1) * data['Spread_Ret']
 # Cumulative PnL
 data['Cumulative_PnL'] = (1 + data['Strategy_Ret']).cumprod()
 
-# --- 5. DASHBOARD VISUALS ---
+# DASHBOARD VISUALS
 
 # KPI Metrics
 col1, col2, col3 = st.columns(3)
@@ -143,3 +143,4 @@ st.pyplot(fig_price)
 with st.expander("See Raw Data"):
 
     st.dataframe(data.tail(20))
+
