@@ -6,24 +6,53 @@ import mplfinance as mpf
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+st.set_page_config(page_title="Financial Explorer", layout="wide")
+
 st.title("--Financial Data Explorer--")
 st.sidebar.header("User Input")
 
-ticker = st.sidebar.text_input("Ticker Symbol", "TSLA")
+ticker = st.sidebar.text_input("Ticker Symbol", "TSLA").upper()
 start_date = st.sidebar.date_input("Start Date", dt.date(2025, 1, 1))
 end_date = st.sidebar.date_input("End Date", dt.date(2025, 12, 31))
 
+if ticker:
+    try:
+        stock_info = yf.Ticker(ticker).info
+        company_name = stock_info.get('shortName', ticker)
+        st.sidebar.success(f"Valid Ticker: {company_name}")
+    except:
+        st.sidebar.warning("Ticker metadata not found. Double check symbol.")
+
 @st.cache_data
 def get_data(symbol, start, end):
-    data = yf.download(symbol, start=start, end=end, auto_adjust=True)
-
-    if isinstance(data.columns, pd.MultiIndex):
-        data = data.xs(symbol, axis=1, level=1)
-    return data
+    try:
+        data = yf.download(symbol, start=start, end=end, auto_adjust=True)
+        
+        if isinstance(data.columns, pd.MultiIndex):
+            
+            if symbol in data.columns.get_level_values(1):
+                data = data.xs(symbol, axis=1, level=1)
+                
+            elif isinstance(data.columns, pd.MultiIndex):
+                data.columns = data.columns.droplevel(1)
+                
+        return data
+    except Exception as e:
+        return pd.DataFrame()
 
 st.write(f"Showing data for **${ticker}**")
+
 try:
     df = get_data(ticker, start_date, end_date)
+
+    if df.empty:
+        st.error(f"No data found for **{ticker}** in this date range. Please check the Ticker symbol or expand the dates.")
+        st.stop()
+
+    if len(df) < 2:
+        st.warning("Not enough data points (need at least 2 days) to calculate returns. Try expanding the date range.")
+        st.stop()
+        
     df['Returns'] = df['Close'].pct_change()
     
     last_price = df['Close'].iloc[-1]
@@ -54,23 +83,20 @@ try:
 
     st.divider()
 
-    df.dropna(inplace=True)
+    plot_df = df.dropna()
 
     st.subheader(f"${ticker} Price Action (1D vs 50SMA)")
 
-    fig, ax = mpf.plot(df, type='candle', style='yahoo', mav=(50), volume=True, returnfig=True)
+    mav_val = 50 if len(plot_df) > 50 else len(plot_df) // 2
 
+    fig, ax = mpf.plot(df, type='candle', style='yahoo', mav=(50), volume=True, returnfig=True)
     st.pyplot(fig)
 
     st.subheader("Risk Profile (Volatility)")
-
     fig2, ax2 = plt.subplots(figsize=(10, 6))
-
     sns.histplot(df['Returns'], bins=50, kde=True, color='blue', ax=ax2)
     ax2.set_title("Distribution of Daily Returns")
-
     st.pyplot(fig2)
 
 except Exception as e:
-
     st.error(f"Error: {e}")
