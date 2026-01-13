@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Financial Explorer", layout="wide")
 
-st.title("--Financial Data Explorer--")
+st.title("Financial Data Explorer")
 st.sidebar.header("User Input")
 
 ticker = st.sidebar.text_input("Ticker Symbol", "TSLA").upper()
@@ -100,3 +100,4 @@ try:
 
 except Exception as e:
     st.error(f"Error: {e}")
+
