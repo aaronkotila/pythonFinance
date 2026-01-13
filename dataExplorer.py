@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 st.title("--Financial Data Explorer--")
 st.sidebar.header("User Input")
 
-ticker = st.sidebar.text_input("Ticker Symbol", "MU")
+ticker = st.sidebar.text_input("Ticker Symbol", "TSLA")
 start_date = st.sidebar.date_input("Start Date", dt.date(2025, 1, 1))
 end_date = st.sidebar.date_input("End Date", dt.date(2025, 12, 31))
 
@@ -72,4 +72,5 @@ try:
     st.pyplot(fig2)
 
 except Exception as e:
+
     st.error(f"Error: {e}")
