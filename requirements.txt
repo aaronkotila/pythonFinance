@@ -4,3 +4,7 @@ yfinance
 mplfinance
 seaborn
 matplotlib
+nltk
+beautifulsoup4
+requests
+plotly
