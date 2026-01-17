@@ -103,6 +103,5 @@ if ticker:
         st.dataframe(scored_news[['Date', 'Time', 'Headline', 'Sentiment', 'compound']], width="stretch")
         
     else:
-
         st.warning("No news found. The ticker might be wrong or Finviz is blocking requests.")
         
